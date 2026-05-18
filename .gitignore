@@ -1,0 +1,7 @@
+.env
+.env.*
+public/.env
+public/_uploads/
+*.cmd
+.DS_Store
+Thumbs.db

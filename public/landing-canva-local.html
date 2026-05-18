@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <script>
+    (function () {
+      try {
+        var k = "visual_theme";
+        var s = localStorage.getItem(k);
+        var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var resolved = s === "light" || s === "dark" ? s : dark ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", resolved);
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Движение Тело Состояние</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400;0,600;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --page: #f4efe5;
+      --ink: #504335;
+      --muted: color-mix(in srgb, var(--ink) 72%, transparent);
+      --line: color-mix(in srgb, var(--ink) 22%, transparent);
+      --btn: #304254;
+      --btn-fg: #f4efe5;
+      --card: rgba(255, 255, 255, 0.55);
+      --shadow: 0 20px 48px rgba(62, 52, 42, 0.12);
+      --field-bg: rgba(255, 255, 255, 0.75);
+      --field-border: color-mix(in srgb, var(--ink) 14%, transparent);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --page: #1e1c19;
+      --ink: #ece6de;
+      --muted: rgba(236, 230, 222, 0.72);
+      --line: rgba(236, 230, 222, 0.18);
+      --btn: #c9a982;
+      --btn-fg: #1a1815;
+      --card: rgba(32, 29, 26, 0.88);
+      --shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+      --field-bg: rgba(20, 18, 16, 0.65);
+      --field-border: rgba(236, 230, 222, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arimo, system-ui, sans-serif;
+      background: var(--page);
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.55;
+    }
+    a { color: inherit; }
+    img { max-width: 100%; height: auto; display: block; }
+
+    .cv-top {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px 18px;
+      background: color-mix(in srgb, var(--page) 90%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .cv-top select {
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .cv-hero {
+      position: relative;
+      min-height: min(100vh, 920px);
+      padding: 20px clamp(14px, 3vw, 40px) clamp(48px, 8vh, 88px);
+      overflow: hidden;
+    }
+    .cv-hero__photo {
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+      border-radius: 3px;
+      overflow: hidden;
+      background: #faf8f4;
+      padding: 8px 8px 14px;
+      box-shadow: 0 26px 52px rgba(45, 38, 30, 0.14), 0 8px 16px rgba(45, 38, 30, 0.06);
+    }
+    .cv-hero__photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 1px; }
+    .cv-hero__photo--tl {
+      left: max(0, 1vw);
+      top: 10%;
+      width: min(200px, 22vw);
+      aspect-ratio: 3 / 4;
+      transform: rotate(5deg);
+    }
+    .cv-hero__photo--bl {
+      left: max(0, 0.5vw);
+      bottom: 10%;
+      width: min(236px, 27vw);
+      aspect-ratio: 1 / 1;
+      transform: rotate(-7deg);
+      z-index: 1;
+    }
+    .cv-hero__photo--r {
+      right: max(-24px, -2vw);
+      top: 9%;
+      width: min(280px, 30vw);
+      aspect-ratio: 3 / 4.1;
+      transform: rotate(-4deg);
+    }
+
+    .cv-hero__inner {
+      position: relative;
+      z-index: 2;
+      max-width: 640px;
+      margin: 0 auto;
+      padding-top: min(6vh, 56px);
+      text-align: center;
+    }
+    .cv-hero__logo {
+      width: min(140px, 36vw);
+      height: auto;
+      margin: 0 auto 12px;
+      opacity: 0.92;
+    }
+    .cv-hero__brand {
+      margin: 0 0 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+    .cv-hero__title {
+      margin: 0 0 12px;
+      font-family: "Libre Baskerville", Georgia, serif;
+      font-size: clamp(24px, 3.8vw, 38px);
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+    .cv-hero__lead {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .cv-hero__tags {
+      margin: 0 0 clamp(32px, 5vh, 48px);
+      font-size: 15px;
+      letter-spacing: 0.04em;
+    }
+    .cv-hero__row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px 32px;
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .cv-hero__quote {
+      padding-left: 14px;
+      border-left: 1px solid var(--line);
+      font-size: 16px;
+      color: var(--muted);
+    }
+    .cv-hero__pills { display: flex; flex-direction: column; gap: 12px; }
+    .cv-pill {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .cv-pill:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+
+    .cv-bridge {
+      padding: 10px 16px 28px;
+      text-align: center;
+      background: var(--page);
+    }
+    .cv-bridge p {
+      margin: 0;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .cv-band {
+      padding: clamp(48px, 8vw, 88px) clamp(18px, 4vw, 40px);
+      border-top: 1px solid var(--line);
+    }
+    .cv-band--alt { background: color-mix(in srgb, var(--page) 65%, #c4b8a8 35%); }
+    html[data-theme="dark"] .cv-band--alt {
+      background: color-mix(in srgb, var(--page) 85%, #2a2622 15%);
+    }
+    .cv-wrap { max-width: 980px; margin: 0 auto; }
+    .cv-h2 {
+      margin: 0 0 16px;
+      font-family: "Libre Baskerville", Georgia, serif;
+      font-size: clamp(22px, 3.2vw, 32px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      text-align: center;
+      text-transform: lowercase;
+    }
+    .cv-prose {
+      margin: 0;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .cv-prose--end { text-align: end; }
+    .cv-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: center;
+      margin-top: 28px;
+    }
+    .cv-split img { border-radius: 8px; box-shadow: var(--shadow); }
+    .cv-cta-bar {
+      margin-top: 28px;
+      display: flex;
+      justify-content: center;
+    }
+    .cv-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 28px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--btn) 40%, var(--ink));
+      background: var(--btn);
+      color: var(--btn-fg);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .cv-btn--ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line);
+    }
+
+    .formats { padding: 48px 20px 72px; }
+    .formats .cv-h2 { margin-bottom: 10px; }
+    .formats .sub {
+      margin: 0 0 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .prod-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 18px 22px;
+    }
+    .prod-card {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: 0 8px 22px rgba(45, 40, 32, 0.06);
+    }
+    .prod-media {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      margin-left: 4px;
+    }
+    .prod-media svg { width: 28px; height: 28px; opacity: 0.5; }
+    .prod-title { margin: 0 0 4px; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+    .prod-desc { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.4; }
+    .prod-meta { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .prod-price { font-size: 14px; font-weight: 700; opacity: 0.9; }
+    .prod-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--card);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .retreat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 28px;
+      align-items: center;
+      margin-top: 24px;
+    }
+    .retreat-grid img { border-radius: 10px; box-shadow: var(--shadow); width: 100%; }
+
+    .lead { padding: 56px 20px 96px; border-top: 1px solid var(--line); }
+    .lead .cv-wrap { max-width: 560px; display: grid; gap: 14px; }
+    .lead .cv-h2 { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; font-family: Arimo, sans-serif; font-weight: 700; }
+    .lead .sub { margin: 0; text-align: center; color: var(--muted); font-size: 15px; }
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field.is-wide { grid-column: 1 / -1; }
+    .field label {
+      display: block;
+      margin: 0 0 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .field input, .field select {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid var(--field-border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      font: inherit;
+      background: var(--field-bg);
+      color: var(--ink);
+      outline: none;
+    }
+    .form-actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 24px;
+      border-radius: 999px;
+      border: 0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: var(--btn);
+      color: var(--btn-fg);
+    }
+    .pill.pill--ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    .form-status { margin-top: 10px; text-align: center; font-size: 14px; color: var(--muted); min-height: 20px; }
+    .form-status.ok { color: #2f6a2f; }
+    .form-status.err { color: #a63333; }
+    html[data-theme="dark"] .form-status.ok { color: #7fd67f; }
+    html[data-theme="dark"] .form-status.err { color: #e07070; }
+
+    @media (max-width: 720px) {
+      .cv-hero__photo { opacity: 0.32; }
+      .cv-hero__row { grid-template-columns: 1fr; }
+      .cv-hero__pills { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+      .cv-split, .retreat-grid { grid-template-columns: 1fr; }
+      .prod-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .cv-prose--end { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cv-top">
+    <select id="themeSelect" aria-label="Тема страницы">
+      <option value="auto">Как на устройстве</option>
+      <option value="light">Светлая</option>
+      <option value="dark">Тёмная</option>
+    </select>
+  </div>
+
+  <section class="cv-hero" aria-label="Главный экран">
+    <div class="cv-hero__photo cv-hero__photo--tl" aria-hidden="true">
+      <img src="./Движение Тело Состояние_files/fad25d41569978d3a43a18ae87557b83.png" alt="" width="600" height="800" decoding="async" />
+    </div>
+    <div class="cv-hero__photo cv-hero__photo--bl" aria-hidden="true">
+      <img src="./Движение Тело Состояние_files/4df58f24915598e7d0415dcda964a7c3.jpg" alt="" width="1067" height="1600" decoding="async" />
+    </div>
+    <div class="cv-hero__photo cv-hero__photo--r" aria-hidden="true">
+      <img src="./Движение Тело Состояние_files/9c0df15fa0170f3633db9e073abde91a.jpg" alt="" width="1600" height="900" decoding="async" />
+    </div>
+
+    <div class="cv-hero__inner">
+      <img class="cv-hero__logo" src="./_assets/media/72cb454d11b40df9383c6e2e3d17390f.svg" alt="" width="286" height="256" decoding="async" />
+      <p class="cv-hero__brand">Дух тела</p>
+      <h1 class="cv-hero__title">Движение • тело • состояние</h1>
+      <p class="cv-hero__lead">йога и телесная практика для женщин</p>
+      <p class="cv-hero__tags">онлайн • оффлайн • ретриты</p>
+      <div class="cv-hero__row">
+        <p class="cv-hero__quote">
+          практика, которая помогает снять напряжение и вернуть контакт с телом — без насилия и спешки.
+        </p>
+        <div class="cv-hero__pills">
+          <a href="#lead" class="cv-pill" id="heroRetreat">ретриты у моря</a>
+          <a href="#formats" class="cv-pill" id="heroOnline">онлайн-занятия</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cv-bridge"><p id="formats-heading">Форматы практики</p></div>
+
+  <section class="cv-band cv-band--alt" aria-labelledby="tension-h">
+    <div class="cv-wrap">
+      <h2 class="cv-h2" id="tension-h">когда тело живёт в напряжении</h2>
+      <p class="cv-prose cv-prose--end">
+        Усталость, зажатость, постоянная спешка, ощущение, что ты не успеваешь за своей жизнью — со временем это становится привычным состоянием.
+        Ты продолжаешь двигаться, но контакт с собой становится слабее.
+      </p>
+      <div class="cv-split">
+        <figure style="margin:0">
+          <img src="./Движение Тело Состояние_files/77841d757e860f6efa2c7defcb19bb8a.png" alt="" width="800" height="533" loading="lazy" decoding="async" />
+        </figure>
+        <div>
+          <div class="cv-cta-bar">
+            <a class="cv-btn" href="#lead">записаться на консультацию</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cv-band" aria-labelledby="about-h">
+    <div class="cv-wrap">
+      <h2 class="cv-h2" id="about-h">обо мне</h2>
+      <div class="cv-split">
+        <figure style="margin:0">
+          <img src="./Движение Тело Состояние_files/715eeaad09e2760ac9857d36c93854af.jpg" alt="" width="800" height="533" loading="lazy" decoding="async" />
+        </figure>
+        <div>
+          <p style="margin:0 0 8px;font-size:22px;font-weight:700;font-family:'Libre Baskerville',Georgia,serif">Анастасия Волкова</p>
+          <p class="cv-prose" style="text-align:left;margin:0;color:var(--ink)">
+            Я работаю через тело и движение. Мой путь начался с классической и современной хореографии, а затем практика стала глубже и сместилась в сторону работы с состоянием через тело и йогу.
+            Сегодня я соединяю танец, йогу и телесную осознанность в работе с женщинами и взрослыми. Фокус — не форма движения, а состояние человека в теле.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cv-band cv-band--alt" aria-labelledby="work-h">
+    <div class="cv-wrap">
+      <h2 class="cv-h2" id="work-h">работа через тело</h2>
+      <p class="cv-prose">
+        Я работаю через движение, дыхание и внимание к состоянию. В основе — йога, танец и телесная осознанность. Мы не исправляем тело и не «делаем правильно». Мы убираем лишнее напряжение и возвращаем естественную подвижность.
+      </p>
+      <figure style="margin:28px auto 0;max-width:720px">
+        <img src="./Движение Тело Состояние_files/4359d048451a13b32f0acb1058e343e2.jpg" alt="" width="533" height="800" loading="lazy" decoding="async" />
+      </figure>
+    </div>
+  </section>
+
+  <section class="formats" id="formats" aria-labelledby="formats-heading">
+    <div class="cv-wrap">
+      <h2 class="cv-h2" style="font-size:clamp(20px,2.8vw,28px)">форматы практики</h2>
+      <p class="sub">Выберите удобный формат: онлайн, ретрит, оффлайн или корпоративная программа.</p>
+      <div class="prod-grid">
+        <article class="prod-card">
+          <div class="prod-media" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none"><path d="M10 16h28v16H10z" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <h3 class="prod-title">Онлайн</h3>
+            <p class="prod-desc">Регулярные занятия для поддержки состояния.</p>
+            <div class="prod-meta">
+              <span class="prod-price">от 4 500 ₽</span>
+              <a class="prod-cta" href="#lead">Выбрать</a>
+            </div>
+          </div>
+        </article>
+        <article class="prod-card">
+          <div class="prod-media" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none"><path d="M10 30c6-10 22-10 28 0" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <h3 class="prod-title">Ретриты</h3>
+            <p class="prod-desc">Глубокая работа в пространстве природы и движения.</p>
+            <div class="prod-meta">
+              <span class="prod-price">54 200 ₽</span>
+              <a class="prod-cta" href="#lead">Выбрать</a>
+            </div>
+          </div>
+        </article>
+        <article class="prod-card">
+          <div class="prod-media" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none"><path d="M12 30l12-14 12 14" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <h3 class="prod-title">Оффлайн</h3>
+            <p class="prod-desc">Живые занятия: йога, танец, работа с телом.</p>
+            <div class="prod-meta">
+              <span class="prod-price">от 8 900 ₽ / мес.</span>
+              <a class="prod-cta" href="#lead">Выбрать</a>
+            </div>
+          </div>
+        </article>
+        <article class="prod-card">
+          <div class="prod-media" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="22" r="6" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <h3 class="prod-title">Корпоративные</h3>
+            <p class="prod-desc">Онлайн и оффлайн форматы для команд.</p>
+            <div class="prod-meta">
+              <span class="prod-price">от 120 000 ₽ / день</span>
+              <a class="prod-cta" href="#lead">Выбрать</a>
+            </div>
+          </div>
+        </article>
+      </div>
+      <p style="text-align:center;margin-top:24px">
+        <a class="cv-btn cv-btn--ghost" href="#retreat-detail">подробнее о ретрите</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="cv-band" id="retreat-detail" aria-labelledby="retreat-h">
+    <div class="cv-wrap">
+      <h2 class="cv-h2" id="retreat-h">ретрит у моря</h2>
+      <p class="cv-prose">
+        Пространство, где через движение, практику и среду уходит напряжение и возвращается ощущение себя. Мягкий ритм, море, тишина и внимание к телу.
+      </p>
+      <div class="retreat-grid">
+        <img src="./Движение Тело Состояние_files/ca078babb6cadf63104c8bd17a9e4ef6.jpg" alt="" width="800" height="533" loading="lazy" decoding="async" />
+        <img src="./Движение Тело Состояние_files/ebfca74fbc457dc0ccb24cea810a79e4.jpg" alt="" width="533" height="800" loading="lazy" decoding="async" />
+      </div>
+    </div>
+  </section>
+
+  <section class="cv-band cv-band--alt" aria-labelledby="level-h">
+    <div class="cv-wrap">
+      <h2 class="cv-h2" id="level-h">подходит для любого уровня</h2>
+      <div class="cv-split">
+        <p class="cv-prose" style="text-align:left;margin:0;color:var(--ink)">
+          Даже если вы никогда не занимались йогой или спортом, практика строится мягко и постепенно.
+        </p>
+        <figure style="margin:0">
+          <img src="./Движение Тело Состояние_files/d1e58f5e037ba191d4583ecf0d82d6a3.jpg" alt="" width="533" height="800" loading="lazy" decoding="async" />
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="lead" id="lead" aria-label="Заявка">
+    <div class="cv-wrap">
+      <h2 class="cv-h2">Оставить заявку</h2>
+      <p class="sub">Те же поля и отправка, что на каркасе: <code>/api/leads</code>. Без скриптов Canva.</p>
+      <form class="form-card" id="leadForm">
+        <input type="hidden" name="ctaSource" value="canva_local" />
+        <input type="hidden" name="interest" id="leadInterest" value="" />
+        <input type="hidden" name="tariffPlan" id="leadTariff" value="" />
+        <div class="form-grid">
+          <div class="field is-wide">
+            <label for="interestSelect">Формат</label>
+            <select id="interestSelect">
+              <option value="" selected>Выберите формат…</option>
+              <option value="Онлайн" data-tariff="от 4 500 ₽">Онлайн</option>
+              <option value="Ретриты" data-tariff="54 200 ₽">Ретриты</option>
+              <option value="Оффлайн" data-tariff="от 8 900 ₽ / мес.">Оффлайн</option>
+              <option value="Корпоративные" data-tariff="от 120 000 ₽ / день">Корпоративные</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="name">Имя</label>
+            <input id="name" name="name" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="phone">Телефон</label>
+            <input id="phone" name="phone" autocomplete="tel" placeholder="+7 …" required />
+          </div>
+          <div class="field">
+            <label for="social">Ник / соцсеть</label>
+            <input id="social" name="social" autocomplete="off" placeholder="@telegram" />
+          </div>
+          <div class="field">
+            <label for="preferredAt">Дата и время</label>
+            <input id="preferredAt" name="preferredAt" type="datetime-local" required />
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="pill">Отправить</button>
+          <a class="pill pill--ghost" href="#formats">Форматы</a>
+        </div>
+        <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    const THEME_KEY = "visual_theme";
+    const themeSelect = document.getElementById("themeSelect");
+    function getSystemResolved() {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    function getStoredMode() {
+      try {
+        const v = localStorage.getItem(THEME_KEY);
+        if (v === "light" || v === "dark" || v === "auto") return v;
+      } catch {}
+      return "auto";
+    }
+    function applyTheme(mode) {
+      const m = mode === "light" || mode === "dark" || mode === "auto" ? mode : "auto";
+      const resolved = m === "auto" ? getSystemResolved() : m;
+      document.documentElement.setAttribute("data-theme", resolved);
+      try {
+        localStorage.setItem(THEME_KEY, m);
+      } catch {}
+      if (themeSelect) themeSelect.value = m;
+    }
+    applyTheme(getStoredMode());
+    themeSelect?.addEventListener("change", () => applyTheme(themeSelect.value));
+    try {
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+        if (getStoredMode() === "auto") applyTheme("auto");
+      });
+    } catch {}
+  </script>
+  <script>
+    (function () {
+      var interestInput = document.getElementById("leadInterest");
+      var tariffInput = document.getElementById("leadTariff");
+      var interestSelect = document.getElementById("interestSelect");
+      var form = document.getElementById("leadForm");
+      var statusEl = document.getElementById("formStatus");
+      var nameEl = document.getElementById("name");
+
+      function setInterest(payload) {
+        if (typeof payload.interest === "string") interestInput.value = payload.interest;
+        if (typeof payload.tariffPlan === "string") tariffInput.value = payload.tariffPlan;
+        if (interestSelect && typeof payload.interest === "string") {
+          interestSelect.value = payload.interest;
+          var opt = interestSelect.selectedOptions && interestSelect.selectedOptions[0];
+          var tr = opt && opt.getAttribute("data-tariff");
+          if (!payload.tariffPlan && tr) tariffInput.value = tr;
+        }
+        var h = form.querySelector('input[name="ctaSource"]');
+        if (h && typeof payload.source === "string") h.value = payload.source;
+      }
+
+      document.getElementById("heroRetreat")?.addEventListener("click", function (e) {
+        e.preventDefault();
+        setInterest({ interest: "Ретриты", tariffPlan: "54 200 ₽", source: "hero_retreat" });
+        document.getElementById("lead").scrollIntoView({ behavior: "smooth", block: "start" });
+        setTimeout(function () {
+          nameEl && nameEl.focus();
+        }, 350);
+      });
+      document.getElementById("heroOnline")?.addEventListener("click", function (e) {
+        e.preventDefault();
+        document.getElementById("formats").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      document.addEventListener("click", function (e) {
+        var btn = e.target.closest("a.prod-cta, a.cv-btn");
+        if (!btn) return;
+        if (btn.classList.contains("cv-btn") && btn.getAttribute("href") === "#lead") {
+          e.preventDefault();
+          setInterest({ interest: "", tariffPlan: "", source: "consult_cta" });
+          document.getElementById("lead").scrollIntoView({ behavior: "smooth", block: "start" });
+          setTimeout(function () {
+            nameEl && nameEl.focus();
+          }, 300);
+          return;
+        }
+        if (!btn.classList.contains("prod-cta")) return;
+        e.preventDefault();
+        var card = btn.closest(".prod-card");
+        if (!card) return;
+        var title = (card.querySelector(".prod-title") && card.querySelector(".prod-title").textContent.trim()) || "";
+        var price = (card.querySelector(".prod-price") && card.querySelector(".prod-price").textContent.trim()) || "";
+        setInterest({ interest: title, tariffPlan: price, source: "formats" });
+        document.getElementById("lead").scrollIntoView({ behavior: "smooth", block: "start" });
+        setTimeout(function () {
+          nameEl && nameEl.focus();
+        }, 280);
+      });
+
+      interestSelect.addEventListener("change", function () {
+        var opt = interestSelect.selectedOptions[0];
+        setInterest({
+          interest: interestSelect.value || "",
+          tariffPlan: (opt && opt.getAttribute("data-tariff")) || "",
+          source: "form",
+        });
+      });
+
+      function setStatus(t, k) {
+        statusEl.textContent = t || "";
+        statusEl.className = "form-status" + (k ? " " + k : "");
+      }
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        setStatus("Отправляем…");
+        var fd = new FormData(form);
+        var payload = Object.fromEntries(fd.entries());
+        if (!String(payload.interest || "").trim()) {
+          setStatus("Выберите формат.", "err");
+          return;
+        }
+        if (location.protocol === "file:") {
+          setStatus("Нужен http:// (npm start).", "err");
+          return;
+        }
+        try {
+          var res = await fetch("/api/leads", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          var data = await res.json().catch(function () {
+            return {};
+          });
+          if (!res.ok) {
+            setStatus(data.message || (data.errors ? Object.values(data.errors).join(" · ") : "Ошибка."), "err");
+            return;
+          }
+          form.reset();
+          setInterest({ interest: payload.interest, tariffPlan: payload.tariffPlan, source: "lead" });
+          setStatus("Готово. Заявка отправлена.", "ok");
+        } catch (err) {
+          setStatus("Сервер недоступен.", "err");
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
