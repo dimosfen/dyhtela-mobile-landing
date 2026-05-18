@@ -4,15 +4,14 @@
 (function () {
   var MQ = "(max-width: 900px)";
   var SPEED = 0.35;
-  var CANVA_DIR = "./\u0414\u0432\u0438\u0436\u0435\u043d\u0438\u0435 \u0422\u0435\u043b\u043e \u0421\u043e\u0441\u0442\u043e\u044f\u043d\u0438\u0435_files/";
   var BG = {
     forest: {
-      primary: "./_assets/media/1.jpg",
-      fallback: CANVA_DIR + "9c0df15fa0170f3633db9e073abde91a.jpg",
+      primary: "./assets/media/1.jpg",
+      fallback: "./assets/media/9c0df15fa0170f3633db9e073abde91a.jpg",
     },
     sea: {
-      primary: "./_assets/media/2.jpg",
-      fallback: CANVA_DIR + "4df58f24915598e7d0415dcda964a7c3.jpg",
+      primary: "./assets/media/2.jpg",
+      fallback: "./assets/media/4df58f24915598e7d0415dcda964a7c3.jpg",
     },
   };
 
